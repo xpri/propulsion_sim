@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(sandbox_interfaces REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 
 if(BUILD_TESTING)
@@ -36,6 +36,7 @@ target_sources(${PROJECT_NAME} PRIVATE ${PROJECT_SOURCES})
 ament_target_dependencies(${PROJECT_NAME}
   rclcpp
   std_msgs
+  geometry_msgs
   )
 
 install(TARGETS
