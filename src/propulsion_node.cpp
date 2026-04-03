@@ -7,8 +7,10 @@
 #include "rclcpp/rclcpp.hpp"
 // Include the standard string message type library
 #include "std_msgs/msg/string.hpp"
-
+// Include the library for data representations of movement 
 #include "geometry_msgs/msg/pose_stamped.hpp"
+// Include the library to handle boolean arithmetic
+#include "std_msgs/msg/string.hpp"
 
 // To use s, ms, etc
 using namespace std::chrono_literals;
@@ -21,6 +23,15 @@ class PropulsionSimNode : public rclcpp::Node
             count_(0)     //initializes node with the name "propulsion_sim"
         {
             publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("rocket_pose", 10);
+            parachute_subscriber_ = this->create_subscription<std_msgs::msg::Bool>
+            (
+                "cmd_parachute",
+                10,
+                [this](const std_msgs::msg::Bool::SharedPtr msg)
+                {
+                    this->parachute_deployed = msg->data;
+                }
+            );
 
             this->declare_parameter("thrust_N", 200.0);          // Thrust is in newtons
             this->declare_parameter("burn_rate_kg/s", 1.0);     // burn rate is in kg/s
@@ -45,6 +56,10 @@ class PropulsionSimNode : public rclcpp::Node
             RCLCPP_INFO(this->get_logger(), "Propulsion simulation made with ROS2 nodes!!!");    
         }
     private:
+        bool parachute_deployed = false;
+        rclcpp::Subcription<>::SharedPtr parachute_
+
+
 
         void update_physics()
         {
