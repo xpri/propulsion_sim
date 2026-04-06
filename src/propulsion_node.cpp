@@ -30,6 +30,12 @@ class PropulsionSimNode : public rclcpp::Node
                 [this](const std_msgs::msg::Bool::SharedPtr msg)
                 {
                     this->parachute_deployed = msg->data;
+
+                    if (this->parachute_dedployed == true)
+                    {
+                        RCLCPP_INFO(this->get_logger(), "Recieved parachute deployment status from flight computer!");
+                    }
+                    
                 }
             );
 
@@ -57,7 +63,8 @@ class PropulsionSimNode : public rclcpp::Node
         }
     private:
         bool parachute_deployed = false;
-        rclcpp::Subcription<>::SharedPtr parachute_
+        rclcpp::Subcription<std_msgs::msg::Bool>::SharedPtr parachute_subscriber_;
+
 
 
 
@@ -78,6 +85,12 @@ class PropulsionSimNode : public rclcpp::Node
             double current_thrust = 0.0;
             double drag_force = 0.0;
             double net_force = 0.0;
+            double current_C_d = C_d;
+            if (parachute_deployed_ == true)
+            {
+                current_C_d = 2.5;       // Higher drag coefficient b/c parachute is now deployed
+            }
+            
             if (current_mass_ > dry_mass)
             {
                 current_thrust = thrust_force;
@@ -95,7 +108,7 @@ class PropulsionSimNode : public rclcpp::Node
             // F = m*a => a = F/m
             // Also Acceleration = thrust / mass - g
             // Adding net force to inlcude other sources of force. i.e. drag force
-            drag_force = (0.5)*rho*(velocity_)*(velocity_)*C_d*A;
+            drag_force = (0.5)*rho*(velocity_)*(velocity_)*(current_C_d)*A;
             net_force = current_thrust - drag_force - (current_mass_ * g);
             
             double acceleration = net_force / current_mass_;
